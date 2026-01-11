@@ -1,6 +1,6 @@
 ### Generar dígitos de la raíz cuadrada de 2
 ### Autor: Arturo Erdely
-### Fecha: 2026-01-10
+### Fecha: 2026-01-11
 
 
 ## Algunos tipos de números y su representación binaria
@@ -292,14 +292,53 @@ println(rd)
 # comparemos:
 subnasa == rd
 
-
-# Advertencia: este algoritmo NO está optimizado,
-# preferí claridad sobre velocidad, pero es posible
-# modificarlo para que sea más rápido y eficiente
-# con el uso de memoria.
-
 @time r = raíz2(10_000);
 @time r = raíz2(20_000);
 subnasa = nasa[1:20_002];
 rd = "1." * join(r[1]);
+subnasa == rd
+
+# Advertencia: La implementación del algoritmo NO está
+# optimizada, preferí claridad sobre velocidad, pero es posible
+# modificarlo para que sea más rápido y eficiente
+# con el uso de memoria. Por ejemplo:
+
+function raíz2A(m::Int)
+    # calcular m dígitos de √2 = 1.d₁d₂…dₘ
+    t = big(1)
+    d = zeros(Int, m)
+    #
+    cota = 2 * big(10)^0 
+    #
+    for n ∈ 1:m
+        #= 
+        dígito = 0
+        while (10*t + dígito)^2 < 2*(big(10)^(2*n))
+            dígito += 1 # es lo mismo que: dígito = dígito + 1
+        end
+        d[n] = dígito - 1
+        t = 10*t + d[n]
+        =#
+        cota *= 100 # es lo mismo que: cota = cota * 100
+        t *= 10 # es lo mismo que: t = t * 10
+        for dígito ∈ 0:9
+            if (t + dígito)^2 < cota
+                d[n] = dígito
+            else
+                break
+            end
+        end
+        t += d[n]
+    end
+    return (d, t)
+end
+
+# comprobando nueva versión 
+raíz2(1000)[1] == raíz2A(1000)[1]
+@time r1 = raíz2(10_000);
+@time r2 = raíz2A(10_000);
+
+@time r2 = raíz2A(20_000);
+subnasa = nasa[1:20_002];
+rd = "1." * join(r2[1]);
 subnasa == rd
