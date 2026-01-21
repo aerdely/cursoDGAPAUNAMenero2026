@@ -1,6 +1,6 @@
 ### Cotas de Fréchet-Hoeffding
 ### Autor: Arturo Erdely
-### Fecha: 2026-01-17
+### Fecha: 2026-01-21
 
 
 using Plots, LaTeXStrings # paquetes instalados previamente
@@ -9,7 +9,7 @@ using Plots, LaTeXStrings # paquetes instalados previamente
 ## Definición de funciones
 begin
     W(u,v) = max(u + v - 1, 0) # cota inferior de FH
-    Π(u,v) = u * v # independencia
+    Π(u,v) = u * v # independencia 
     M(u,v) = min(u, v) # cota superior de FH
 end;
 
@@ -25,7 +25,7 @@ begin
     for i ∈ 1:n, j ∈ 1:n 
         w[j, i] = W(u[i], v[j])
         p[j, i] = Π(u[i], v[j])
-        m[i, j] = M(u[i], v[j])
+        m[j, i] = M(u[i], v[j])
     end
 end
 
@@ -79,7 +79,7 @@ begin
 end
 
 
-## δ(A,B) con P(A)=u y P(B)=v
+## δ(A,B) = P(A∩B) - uv,   con P(A)=u y P(B)=v
 ## δmin ≤ δ(A,B) ≤ δmax
 begin
     δmin(u,v) = -min((1-u)*(1-v), u*v) # cota inferior
@@ -109,6 +109,7 @@ contour(u, v, δδamp, fill = true, xlabel = L"u", ylabel = L"v", title = L"δ_{
 
 pA = 0.7 # P(A)
 pB = 0.2 # P(B)
+pA*pB # P(A)P(B)
 
 δmin(pA, pB)
 δmax(pA, pB)
