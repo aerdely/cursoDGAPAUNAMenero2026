@@ -9,7 +9,7 @@
 using Plots, LaTeXStrings, Distributions
 
 
-# frontera de región cero 
+# curva frontera de región cero 
 g(u,θ) = 1 - (1 - (1-u)^θ)^(1/θ) 
 
 # ψ(v|u) = ∂C(u,v)/∂u como función de v, para u y θ fijos
@@ -34,8 +34,8 @@ end
 
 # Gráfica de ψ(v|u) para u y θ fijos
 begin
-    θ = 2.3
-    u = 0.4
+    θ = 2.3   # θ ≥ 1
+    u = 0.4   # 0 < u < 1
     vv = collect(range(0, 1, length = 1_000))
     ψ = [∂C∂u(u, v, θ) for v ∈ vv]
     scatter(vv, ψ, xlabel = L"v", ylabel = L"\partial C_{\theta}(u,v) / \partial u",
@@ -47,7 +47,7 @@ begin
     hline!([vg], ls = :dash, color = :gray, label = "(1-u)^(θ-1) = $(round(vg, digits=4))")
 end
 
-# Agregar gráfica de ψ⁻¹(t|u) para u y θ fijos
+# Agregar gráfica de ψ⁻¹(t|u) para u y θ fijos (para comprobar)
 begin
     tt = collect(range(0, 1, length = 1_000))
     plot!([ψi(t, u, θ) for t ∈ tt], tt, color = :cyan,
@@ -68,16 +68,16 @@ function simular_copula(n, θ)
 end
 
 begin
-    θ = 2
+    θ = 2.3
     U, V = simular_copula(1000, θ)
     scatter(U, V, xlabel = L"U", ylabel = L"V", size = (500,470), 
             ms = 2.0, mcolor = :blue, label = "")
 end
-# agregar frontera
+# agregar curva frontera de región cero
 plot!(sort(U), g.(sort(U), θ), color = :red, lw = 2.0, label = L"g_{θ}(u)")
 
 
-## Simular (X,Y) con cópula arquimediana y márginales dadas 
+## Simular (X,Y) con cópula arquimediana y marginales dadas 
 
 function simular_XY(n, θ, distX, distY)
     U, V = simular_copula(n, θ)
@@ -87,10 +87,22 @@ function simular_XY(n, θ, distX, distY)
 end
 
 begin
-    θ = 10
+    θ = 2.3
     distX = Beta(0.8,0.5)
     distY = Gamma(2,3)
     X, Y = simular_XY(1000, θ, distX, distY)
     scatter(X, Y, xlabel = L"X", ylabel = L"Y", size = (500,470), 
             ms = 2.0, mcolor = :green, label = "")
 end
+
+# comprobando margiales
+
+histogram(X, bins = 30, xlabel = L"X", ylabel = "densidad",
+          title = "Histograma de X ~ Beta(0.8,0.5)", size = (500,400), label = "empírica",
+          mcolor = :orange, linecolor = :black, normalize = true)
+plot!(x -> pdf(distX, x), 0:0.01:1, color = :red, lw = 2.0, label = "teórica")
+
+histogram(Y, bins = 30, xlabel = L"Y", ylabel = "denidad",
+          title = "Histograma de Y ~ Gamma(2,3)", size = (500,400), label = "empírica",
+          mcolor = :purple, linecolor = :black, normalize = true)
+plot!(x -> pdf(distY, x), 0:0.1:20, color = :red, lw = 2.0, label = "teórica")

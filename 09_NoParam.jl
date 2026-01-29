@@ -23,7 +23,7 @@ end
 # cópula arquimediana
 C(u,v,θ) = ϕi(ϕ(u,θ) + ϕ(v,θ),θ)
 
-# frontera de región cero 
+# curva frontera de la región cero 
 g(u,θ) = 1 - (1 - (1-u)^θ)^(1/θ) 
 
 
@@ -52,7 +52,7 @@ end
 
 # Simulación de n observaciones de la cópula arquimediana con parámetro θ
 begin
-    θ = 2
+    θ = 2.3
     n = 4_000
     U, V = simular_copula(n, θ)
     scatter(U, V, xlabel = L"U", ylabel = L"V", legend = false, size = (500, 500), markersize = 0.5)
@@ -78,11 +78,11 @@ function CopBer(u, v, m)
     return valor
 end
 
-# Ejemplos de evaluación de las cópulas
+# Ejemplo de evaluación de las cópulas
 u, v = 0.4, 0.6
-C(u, v, θ)
-Cn(u, v)
-CopBer(u, v, 100)
+C(u, v, θ) # valor teórico
+Cn(u, v) # valor empírico
+CopBer(u, v, 100) # valor Bernstein
 
 
 ## Comparar curvas de nivel de las tres cópulas
@@ -112,7 +112,7 @@ begin
     )
 end
 
-# Cópula Bernstein
+# Cópula Bernstein (tarda aprox 12 segundos)
 @time begin
     Copula = [CopBer(u,v,50) for u in uu, v in vv] 
     nivCopula = contour(uu, vv, Copula, xlabel = L"u", ylabel = L"v",
